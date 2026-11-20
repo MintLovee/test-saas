@@ -6,6 +6,9 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // GitHub Pages 프로젝트 페이지 경로: https://mintlovee.github.io/test-saas/
+    // 저장소 이름과 똑같이 맞추세요 (앞뒤 슬래시 포함).
+    base: '/test-saas/',
     plugins: [
       react(),
       tailwindcss(),
