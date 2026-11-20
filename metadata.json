@@ -1,0 +1,6 @@
+{
+  "name": "뭐든 요청함",
+  "description": "팀원을 위한 Liquid Glass 스타일 맞춤형 요청 접수 및 처리 워크플로우 앱",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
