@@ -69,11 +69,16 @@ export function RequestDetailModal({
   onStartParticipantChat?: (memberIds: string[], roomTitle?: string) => void;
 }) {
   const [commentBody, setCommentBody] = useState('');
-  const [rejectMode, setRejectMode] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
+  const [reasonTargetStatus, setReasonTargetStatus] = useState<'반려' | '보류' | null>(null);
+  const [reasonText, setReasonText] = useState('');
+  const [pendingStatusConfirm, setPendingStatusConfirm] = useState<{
+    toStatus: RequestStatus;
+    label: string;
+    reason?: string;
+  } | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [confirmModal, setConfirmModal] = useState<
-    'deleteRequest' | 'cancelEdit' | 'cancelReject' | 'closeWhileEditing' | null
+    'deleteRequest' | 'cancelEdit' | 'cancelReason' | 'closeWhileEditing' | null
   >(null);
 
   const [editing, setEditing] = useState(false);
@@ -91,8 +96,9 @@ export function RequestDetailModal({
     useFormValidationFeedback();
 
   useEffect(() => {
-    setRejectMode(false);
-    setRejectReason('');
+    setReasonTargetStatus(null);
+    setReasonText('');
+    setPendingStatusConfirm(null);
     setActionError(null);
     setConfirmModal(null);
     setEditing(false);
@@ -137,57 +143,56 @@ export function RequestDetailModal({
     ? request.recipients.filter((r) => r.role === 'cc')
     : [];
 
-  const handleStatusClick = (toStatus: RequestStatus, requiresReason?: boolean) => {
+  const handleStatusClick = (
+    toStatus: RequestStatus,
+    label: string,
+    requiresReason?: boolean
+  ) => {
     if (!request) return;
     setActionError(null);
-    if (requiresReason) {
-      setRejectMode(true);
-      clearFieldInvalid('rejectReason');
+    if (requiresReason && (toStatus === '반려' || toStatus === '보류')) {
+      setReasonTargetStatus(toStatus);
+      clearFieldInvalid('statusReason');
       window.requestAnimationFrame(() => {
-        const el = document.getElementById('reject-reason-input');
+        const el = document.getElementById('status-reason-input');
         if (el instanceof HTMLElement) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           el.focus({ preventScroll: true });
         }
       });
       window.setTimeout(() => {
-        const el = document.getElementById('reject-reason-input');
+        const el = document.getElementById('status-reason-input');
         if (el instanceof HTMLElement && document.activeElement !== el) {
           el.focus({ preventScroll: true });
         }
       }, 90);
       return;
     }
-    const res = onUpdateStatus(request.id, toStatus);
-    if (!res.ok) {
-      setActionError(res.error);
-    }
+    setPendingStatusConfirm({ toStatus, label });
   };
 
-  const handleConfirmReject = (e: FormEvent) => {
+  const handleSubmitReason = (e: FormEvent) => {
     e.preventDefault();
-    if (!request) return;
+    if (!request || !reasonTargetStatus) return;
     setActionError(null);
-    if (!rejectReason.trim()) {
-      setActionError('반려할 때는 반려 사유를 반드시 입력해야 합니다.');
+    if (!reasonText.trim()) {
+      setActionError(
+        reasonTargetStatus === '보류'
+          ? '보류(일정 지연) 처리할 때는 사유를 반드시 입력해야 합니다.'
+          : '반려할 때는 반려 사유를 반드시 입력해야 합니다.'
+      );
       triggerInvalid(
-        [{ key: 'rejectReason', elementId: 'reject-reason-input' }],
-        'reject-reason-input'
+        [{ key: 'statusReason', elementId: 'status-reason-input' }],
+        'status-reason-input'
       );
       return;
     }
-    const res = onUpdateStatus(request.id, '반려', rejectReason);
-    if (!res.ok) {
-      setActionError(res.error);
-      triggerInvalid(
-        [{ key: 'rejectReason', elementId: 'reject-reason-input' }],
-        'reject-reason-input'
-      );
-      return;
-    }
-    clearFieldInvalid('rejectReason');
-    setRejectMode(false);
-    setRejectReason('');
+    clearFieldInvalid('statusReason');
+    setPendingStatusConfirm({
+      toStatus: reasonTargetStatus,
+      label: reasonTargetStatus === '보류' ? '보류 확정' : '반려 확정',
+      reason: reasonText.trim(),
+    });
   };
 
   const handleSaveEdit = (e: FormEvent) => {
@@ -303,7 +308,7 @@ export function RequestDetailModal({
   );
 
   const handleRequestClose = () => {
-    if (isEditDirty || (rejectMode && rejectReason.trim())) {
+    if (isEditDirty || (reasonTargetStatus && reasonText.trim())) {
       setConfirmModal('closeWhileEditing');
       return;
     }
@@ -646,6 +651,18 @@ export function RequestDetailModal({
                 </div>
               )}
 
+              {/* Hold / Delay Reason Callout */}
+              {request.status === '보류' && request.holdReason && (
+                <div className="rounded-[20px] border border-indigo-400/50 bg-indigo-500/18 p-4">
+                  <div className="text-xs font-bold text-indigo-900 dark:text-indigo-200">
+                    보류 사유
+                  </div>
+                  <p className="mt-1 text-sm font-medium text-indigo-950 dark:text-indigo-100">
+                    {request.holdReason}
+                  </p>
+                </div>
+              )}
+
               {/* Requester edit lock notice after 진행 중 */}
               {isRequester && !editPermission.allowed && (
                 <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
@@ -709,13 +726,15 @@ export function RequestDetailModal({
                   <button
                     key={opt.toStatus}
                     type="button"
-                    onClick={() => handleStatusClick(opt.toStatus, opt.requiresReason)}
+                    onClick={() => handleStatusClick(opt.toStatus, opt.label, opt.requiresReason)}
                     className={`focus-glass glass-press inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold min-h-[40px] ${
                       opt.primary
                         ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-md'
-                        : opt.requiresReason
+                        : opt.toStatus === '반려'
                           ? 'bg-rose-500/20 text-rose-900 dark:text-rose-100 border border-rose-400/50 hover:bg-rose-500/30'
-                          : 'bg-white/45 dark:bg-white/15 border border-white/50 dark:border-white/20 hover:bg-white/65'
+                          : opt.toStatus === '보류'
+                            ? 'bg-indigo-500/20 text-indigo-900 dark:text-indigo-100 border border-indigo-400/50 hover:bg-indigo-500/30'
+                            : 'bg-white/45 dark:bg-white/15 border border-white/50 dark:border-white/20 hover:bg-white/65'
                     }`}
                   >
                     {opt.primary && <Check size={14} strokeWidth={2.5} aria-hidden="true" />}
@@ -725,48 +744,57 @@ export function RequestDetailModal({
               </div>
 
               <AnimatePresence initial={false}>
-                {rejectMode && (
+                {reasonTargetStatus && (
                   <motion.form
-                    key="reject-reason-form"
+                    key={`status-reason-form-${reasonTargetStatus}`}
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={IOS_SPRING_CONTENT}
-                    onSubmit={handleConfirmReject}
+                    onSubmit={handleSubmitReason}
                     noValidate
                     className="overflow-hidden mt-2 pt-3 border-t border-white/30 dark:border-white/15 space-y-2.5"
                   >
                     <label
-                      htmlFor="reject-reason-input"
-                      className="block text-xs font-bold text-rose-900 dark:text-rose-200"
+                      htmlFor="status-reason-input"
+                      className={`block text-xs font-bold ${
+                        reasonTargetStatus === '보류'
+                          ? 'text-indigo-900 dark:text-indigo-200'
+                          : 'text-rose-900 dark:text-rose-200'
+                      }`}
                     >
-                      반려 사유 <span className="text-rose-600">*</span> (필수)
+                      {reasonTargetStatus === '보류' ? '보류 사유' : '반려 사유'}{' '}
+                      <span className="text-rose-600">*</span> (필수)
                     </label>
                     <textarea
-                      id="reject-reason-input"
+                      id="status-reason-input"
                       rows={2}
-                      value={rejectReason}
-                      aria-invalid={isInvalid('rejectReason')}
+                      value={reasonText}
+                      aria-invalid={isInvalid('statusReason')}
                       onChange={(e) => {
-                        setRejectReason(e.target.value);
-                        clearFieldInvalid('rejectReason');
+                        setReasonText(e.target.value);
+                        clearFieldInvalid('statusReason');
                       }}
-                      placeholder="요청자가 이해할 수 있도록 반려 사유를 입력해 주세요"
+                      placeholder={
+                        reasonTargetStatus === '보류'
+                          ? '일정이 미뤄진 이유와 예상 재개 시점을 입력해 주세요'
+                          : '요청자가 이해할 수 있도록 반려 사유를 입력해 주세요'
+                      }
                       className={`focus-glass glass w-full rounded-[16px] px-3.5 py-2.5 text-sm ${
-                        isInvalid('rejectReason') ? 'input-invalid' : ''
+                        isInvalid('statusReason') ? 'input-invalid' : ''
                       }`}
                     />
                     <div className="flex items-center justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => {
-                          if (rejectReason.trim()) {
-                            setConfirmModal('cancelReject');
+                          if (reasonText.trim()) {
+                            setConfirmModal('cancelReason');
                             return;
                           }
-                          setRejectMode(false);
-                          setRejectReason('');
-                          clearFieldInvalid('rejectReason');
+                          setReasonTargetStatus(null);
+                          setReasonText('');
+                          clearFieldInvalid('statusReason');
                         }}
                         className="focus-glass rounded-full bg-white/35 dark:bg-white/10 px-3.5 py-1.5 text-xs font-semibold min-h-[36px]"
                       >
@@ -774,9 +802,11 @@ export function RequestDetailModal({
                       </button>
                       <button
                         type="submit"
-                        className="focus-glass rounded-full bg-rose-600 text-white px-4 py-1.5 text-xs font-bold min-h-[36px]"
+                        className={`focus-glass rounded-full text-white px-4 py-1.5 text-xs font-bold min-h-[36px] ${
+                          reasonTargetStatus === '보류' ? 'bg-indigo-600' : 'bg-rose-600'
+                        }`}
                       >
-                        반려 확정
+                        {reasonTargetStatus === '보류' ? '보류 확정' : '반려 확정'}
                       </button>
                     </div>
                   </motion.form>
@@ -807,7 +837,13 @@ export function RequestDetailModal({
                           : `님이 요청을 ${log.toStatus} 상태로 등록`}
                       </span>
                       {log.note && (
-                        <p className="mt-0.5 text-rose-800 dark:text-rose-200">
+                        <p
+                          className={`mt-0.5 ${
+                            log.toStatus === '보류'
+                              ? 'text-indigo-800 dark:text-indigo-200'
+                              : 'text-rose-800 dark:text-rose-200'
+                          }`}
+                        >
                           사유: {log.note}
                         </p>
                       )}
@@ -910,6 +946,52 @@ export function RequestDetailModal({
     </AnimatePresence>
 
       <ConfirmDeleteModal
+        open={Boolean(request && pendingStatusConfirm !== null)}
+        variant={pendingStatusConfirm?.toStatus === '반려' ? 'danger' : 'neutral'}
+        icon={pendingStatusConfirm?.toStatus === '반려' ? 'danger' : 'confirm'}
+        title={
+          pendingStatusConfirm
+            ? `"${pendingStatusConfirm.toStatus}" 상태로 변경`
+            : '상태 변경 확인'
+        }
+        message={
+          pendingStatusConfirm && request
+            ? pendingStatusConfirm.reason
+              ? `"${request.title}" 요청을 "${pendingStatusConfirm.toStatus}" 상태로 변경하시겠습니까? (사유: ${pendingStatusConfirm.reason})`
+              : `"${request.title}" 요청을 "${pendingStatusConfirm.toStatus}" 상태로 변경하시겠습니까?`
+            : ''
+        }
+        confirmLabel={
+          pendingStatusConfirm?.toStatus === '반려'
+            ? '반려하기'
+            : pendingStatusConfirm?.toStatus === '보류'
+              ? '보류하기'
+              : '변경하기'
+        }
+        cancelLabel="취소"
+        onCancel={() => setPendingStatusConfirm(null)}
+        onConfirm={() => {
+          const target = pendingStatusConfirm;
+          setPendingStatusConfirm(null);
+          if (!request || !target) return;
+          const res = onUpdateStatus(request.id, target.toStatus, target.reason);
+          if (!res.ok) {
+            setActionError(res.error);
+            if (target.toStatus === '반려' || target.toStatus === '보류') {
+              triggerInvalid(
+                [{ key: 'statusReason', elementId: 'status-reason-input' }],
+                'status-reason-input'
+              );
+            }
+            return;
+          }
+          clearFieldInvalid('statusReason');
+          setReasonTargetStatus(null);
+          setReasonText('');
+        }}
+      />
+
+      <ConfirmDeleteModal
         open={Boolean(request && confirmModal !== null)}
         variant={confirmModal === 'deleteRequest' ? 'danger' : 'neutral'}
         title={
@@ -919,8 +1001,10 @@ export function RequestDetailModal({
               : '요청 삭제 확인'
             : confirmModal === 'cancelEdit'
               ? '수정 취소 확인'
-              : confirmModal === 'cancelReject'
-                ? '반려 작성 취소'
+              : confirmModal === 'cancelReason'
+                ? reasonTargetStatus === '보류'
+                  ? '보류 작성 취소'
+                  : '반려 작성 취소'
                 : '편집 내용 나가기'
         }
         message={
@@ -930,8 +1014,10 @@ export function RequestDetailModal({
               : '정말 이 요청을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
             : confirmModal === 'cancelEdit'
               ? '수정한 내용을 저장하지 않고 취소하시겠습니까?'
-              : confirmModal === 'cancelReject'
-                ? '작성 중인 반려 사유를 취소하시겠습니까?'
+              : confirmModal === 'cancelReason'
+                ? reasonTargetStatus === '보류'
+                  ? '작성 중인 보류 사유를 취소하시겠습니까?'
+                  : '작성 중인 반려 사유를 취소하시겠습니까?'
                 : '작성 중인 내용을 저장하지 않고 나가시겠습니까?'
         }
         confirmLabel={
@@ -961,18 +1047,18 @@ export function RequestDetailModal({
             setEditing(false);
             return;
           }
-          if (action === 'cancelReject') {
-            setRejectMode(false);
-            setRejectReason('');
-            clearFieldInvalid('rejectReason');
+          if (action === 'cancelReason') {
+            setReasonTargetStatus(null);
+            setReasonText('');
+            clearFieldInvalid('statusReason');
             return;
           }
           if (action === 'closeWhileEditing') {
             clearAllInvalid();
             setActionError(null);
             setEditing(false);
-            setRejectMode(false);
-            setRejectReason('');
+            setReasonTargetStatus(null);
+            setReasonText('');
             onClose();
           }
         }}

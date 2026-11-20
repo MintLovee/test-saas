@@ -1,6 +1,6 @@
 export type UserRole = 'admin' | 'member';
 
-export type RequestStatus = '접수' | '확인' | '진행 중' | '완료' | '반려';
+export type RequestStatus = '접수' | '확인' | '진행 중' | '보류' | '완료' | '반려';
 
 export type UrgencyLevel = '낮음' | '보통' | '높음';
 
@@ -82,6 +82,7 @@ export interface Request {
   urgency: UrgencyLevel;
   status: RequestStatus;
   rejectReason: string | null;
+  holdReason?: string | null;
   createdAt: string;
   updatedAt: string;
 }

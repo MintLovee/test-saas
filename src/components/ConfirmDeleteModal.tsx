@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
-import { AlertTriangle, LogOut } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, LogOut } from 'lucide-react';
 import { IOS_EASE, IOS_SPRING_POPOVER } from '../utils/motionPresets';
 
 export function ConfirmDeleteModal({
@@ -10,6 +10,7 @@ export function ConfirmDeleteModal({
   confirmLabel = '삭제',
   cancelLabel = '돌아가기',
   variant = 'danger',
+  icon,
   onCancel,
   onConfirm,
 }: {
@@ -19,12 +20,14 @@ export function ConfirmDeleteModal({
   confirmLabel?: string;
   cancelLabel?: string;
   variant?: 'danger' | 'neutral';
+  icon?: 'danger' | 'logout' | 'confirm';
   onCancel: () => void;
   onConfirm: () => void;
 }) {
   if (typeof document === 'undefined') return null;
 
   const isDanger = variant === 'danger';
+  const resolvedIcon = icon ?? (isDanger ? 'danger' : 'logout');
 
   return createPortal(
     <AnimatePresence>
@@ -59,8 +62,10 @@ export function ConfirmDeleteModal({
                     : 'bg-sky-500/20 text-sky-700 dark:text-sky-300 border-sky-400/40'
                 }`}
               >
-                {isDanger ? (
+                {resolvedIcon === 'danger' ? (
                   <AlertTriangle size={20} aria-hidden="true" />
+                ) : resolvedIcon === 'confirm' ? (
+                  <CheckCircle2 size={20} aria-hidden="true" />
                 ) : (
                   <LogOut size={19} aria-hidden="true" />
                 )}

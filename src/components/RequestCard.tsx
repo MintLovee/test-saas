@@ -67,9 +67,15 @@ export function RequestCard({
               <span aria-hidden="true">·</span>
               <span
                 className={`font-bold tabular-nums whitespace-nowrap ${
-                  dday.isOverdue && request.status !== '완료' && request.status !== '반려'
+                  dday.isOverdue &&
+                  request.status !== '완료' &&
+                  request.status !== '반려' &&
+                  request.status !== '보류'
                     ? 'text-rose-700 dark:text-rose-300'
-                    : dday.isSoon && request.status !== '완료' && request.status !== '반려'
+                    : dday.isSoon &&
+                        request.status !== '완료' &&
+                        request.status !== '반려' &&
+                        request.status !== '보류'
                       ? 'text-amber-800 dark:text-amber-300'
                       : 'text-slate-700 dark:text-slate-300'
                 }`}

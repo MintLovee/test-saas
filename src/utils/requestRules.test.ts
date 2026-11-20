@@ -145,6 +145,47 @@ test('status transitions require assignee and reject requires non-empty reason',
     }).valid,
     true
   );
+
+  const inProgressTransitions = getAvailableStatusTransitions('진행 중', true);
+  assert.equal(
+    inProgressTransitions.some((t) => t.toStatus === '보류' && t.requiresReason),
+    true
+  );
+
+  const holdTransitions = getAvailableStatusTransitions('보류', true);
+  assert.deepEqual(
+    holdTransitions.map((t) => t.toStatus),
+    ['진행 중', '완료', '반려']
+  );
+
+  assert.equal(
+    validateStatusChange({
+      fromStatus: '진행 중',
+      toStatus: '보류',
+      rejectReason: '   ',
+      userIsAssignee: true,
+    }).valid,
+    false
+  );
+
+  assert.equal(
+    validateStatusChange({
+      fromStatus: '진행 중',
+      toStatus: '보류',
+      rejectReason: '외부 디자인 검수 회신 대기 중입니다.',
+      userIsAssignee: true,
+    }).valid,
+    true
+  );
+
+  assert.equal(
+    validateStatusChange({
+      fromStatus: '보류',
+      toStatus: '진행 중',
+      userIsAssignee: true,
+    }).valid,
+    true
+  );
 });
 
 test('recipient validation requires at least one assignee and no duplicates', () => {

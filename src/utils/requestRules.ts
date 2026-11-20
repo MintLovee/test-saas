@@ -7,7 +7,7 @@ import type {
   User,
 } from '../types/models';
 
-export const ALL_STATUSES: RequestStatus[] = ['접수', '확인', '진행 중', '완료', '반려'];
+export const ALL_STATUSES: RequestStatus[] = ['접수', '확인', '진행 중', '보류', '완료', '반려'];
 
 export function isTerminalStatus(status: RequestStatus): boolean {
   return status === '완료' || status === '반려';
@@ -124,11 +124,19 @@ export function getAvailableStatusTransitions(
       return [
         { toStatus: '진행 중', label: '진행 중으로 변경', primary: true },
         { toStatus: '완료', label: '완료 처리' },
+        { toStatus: '보류', label: '보류하기', requiresReason: true },
         { toStatus: '반려', label: '반려하기', requiresReason: true },
       ];
     case '진행 중':
       return [
         { toStatus: '완료', label: '완료 처리', primary: true },
+        { toStatus: '보류', label: '보류하기', requiresReason: true },
+        { toStatus: '반려', label: '반려하기', requiresReason: true },
+      ];
+    case '보류':
+      return [
+        { toStatus: '진행 중', label: '진행 재개', primary: true },
+        { toStatus: '완료', label: '완료 처리' },
         { toStatus: '반려', label: '반려하기', requiresReason: true },
       ];
     default:
@@ -155,6 +163,9 @@ export function validateStatusChange(params: {
   }
   if (toStatus === '반려' && (!rejectReason || rejectReason.trim().length === 0)) {
     return { valid: false, error: '반려할 때는 반려 사유를 반드시 입력해야 합니다.' };
+  }
+  if (toStatus === '보류' && (!rejectReason || rejectReason.trim().length === 0)) {
+    return { valid: false, error: '보류(일정 지연) 처리할 때는 사유를 반드시 입력해야 합니다.' };
   }
   return { valid: true };
 }

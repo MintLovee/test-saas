@@ -151,7 +151,7 @@ export function LoginPage({
               팀 요청 접수 워크스페이스
             </div>
             <h1 className="mt-5 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-950 dark:text-white glass-text-shadow leading-tight">
-              뭐든 요청함
+              Collabee
             </h1>
             <p className="mt-3 text-sm sm:text-base leading-relaxed text-slate-800 dark:text-slate-200">
               비품 신청부터 IT 문의, 업무 협조까지. 요청 유형을 고르고 담당자를 직접 지정해 진행 상황을 한곳에서 투명하게 확인하세요.

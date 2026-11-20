@@ -686,8 +686,10 @@ export const repository = {
 
     const now = new Date().toISOString();
     const prevStatus = req.status;
+    const trimmedReason = (rejectReason ?? '').trim();
     req.status = toStatus;
-    req.rejectReason = toStatus === '반려' ? (rejectReason ?? '').trim() : null;
+    req.rejectReason = toStatus === '반려' ? trimmedReason : null;
+    req.holdReason = toStatus === '보류' ? trimmedReason : null;
     req.updatedAt = now;
 
     // 담당자가 확인 시 seenAt 갱신
@@ -704,7 +706,10 @@ export const repository = {
       actorId,
       fromStatus: prevStatus,
       toStatus,
-      note: toStatus === '반려' ? req.rejectReason ?? undefined : undefined,
+      note:
+        toStatus === '반려' || toStatus === '보류'
+          ? trimmedReason || undefined
+          : undefined,
       createdAt: now,
     });
 

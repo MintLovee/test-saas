@@ -3,6 +3,7 @@ import {
   Clock3,
   Eye,
   Inbox,
+  PauseCircle,
   XCircle,
   AlertTriangle,
 } from 'lucide-react';
@@ -34,6 +35,12 @@ const STATUS_META: Record<
     text: 'text-amber-950 dark:text-amber-100',
     border: 'border-amber-400/55 dark:border-amber-300/35',
     Icon: Clock3,
+  },
+  보류: {
+    bg: 'bg-indigo-500/20 dark:bg-indigo-400/22',
+    text: 'text-indigo-950 dark:text-indigo-100',
+    border: 'border-indigo-400/50 dark:border-indigo-300/35',
+    Icon: PauseCircle,
   },
   완료: {
     bg: 'bg-emerald-500/22 dark:bg-emerald-400/22',

@@ -197,7 +197,7 @@ export function AppShell({
             {/* Brand Wordmark */}
             <div className="px-2 pt-1 pb-4">
               <div className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white glass-text-shadow">
-                뭐든 요청함
+                Collabee
               </div>
               <p className="mt-0.5 text-xs font-medium text-slate-600 dark:text-slate-300 truncate">
                 {team?.name ?? '팀 워크스페이스'}
@@ -280,7 +280,7 @@ export function AppShell({
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="lg:hidden text-base font-extrabold tracking-tight text-slate-900 dark:text-white whitespace-nowrap shrink-0">
-              뭐든 요청함
+              Collabee
             </span>
             <span className="hidden lg:inline text-sm font-semibold text-slate-700 dark:text-slate-200 truncate">
               {activeSection === 'inbox'

@@ -13,7 +13,7 @@ import type {
   User,
 } from '../types/models';
 
-export const SEED_VERSION = 2;
+export const SEED_VERSION = 3;
 
 export interface AppDatabase {
   seedVersion?: number;
@@ -549,6 +549,99 @@ export function createSeedDatabase(): AppDatabase {
       createdAt: isoAgo(1),
       updatedAt: isoAgo(1),
     },
+    {
+      id: 'req_117',
+      teamId: 'team_mkt_1',
+      typeId: 'type_coop',
+      requesterId: 'user_jimin',
+      title: '겨울 시즌 제품 스튜디오 컷 촬영 소품 및 모델 일정 조율',
+      content: '상세페이지 리뉴얼용 메인 비주얼 스튜디오 촬영을 위한 배경지·소품 세팅과 스튜디오 대관 일정을 조율 요청합니다.',
+      fieldValues: {
+        coop_detail: '호리존 4시간 대관 + 화이트/실버 소품 3종',
+        coop_deadline: toLocalISODateOffset(6),
+      },
+      dueDate: toLocalISODateOffset(7),
+      urgency: '보통',
+      status: '보류',
+      rejectReason: null,
+      holdReason: '외부 스튜디오 리모델링 공사로 인해 12월 둘째 주 일정 확정 후 촬영 재개 예정입니다.',
+      createdAt: isoAgo(34),
+      updatedAt: isoAgo(5),
+    },
+    {
+      id: 'req_118',
+      teamId: 'team_mkt_1',
+      typeId: 'type_it',
+      requesterId: 'user_minsu',
+      title: '노션 팀 위키 외부 게스트 권한 일괄 점검 요청',
+      content: '종료된 외주 에이전시 계정 3건의 노션 마케팅 워크스페이스 열람 권한 회수 및 보안 점검 부탁드립니다.',
+      fieldValues: {
+        symptom: '외부 협력사 계약 종료 후에도 일부 페이지 공유 링크가 활성 상태로 남아있음',
+        it_urgency: '즉시 대응 필요',
+      },
+      dueDate: toLocalISODateOffset(1),
+      urgency: '높음',
+      status: '진행 중',
+      rejectReason: null,
+      createdAt: isoAgo(15),
+      updatedAt: isoAgo(2.5),
+    },
+    {
+      id: 'req_119',
+      teamId: 'team_mkt_1',
+      typeId: 'type_review',
+      requesterId: 'user_haeun',
+      title: '연말 고객 감사 뉴스레터 이벤트 약관 및 안내 문구 검토',
+      content: '이메일 구독자 대상 경품 추첨 이벤트 발송 전 개인정보 수집 안내 및 당첨자 발표 기준 문구 검수를 요청드립니다.',
+      fieldValues: {
+        doc_link: 'https://docs.google.com/document/d/year-end-newsletter-terms',
+        review_scope: '대외 발송 최종 승인',
+      },
+      dueDate: toLocalISODateOffset(4),
+      urgency: '보통',
+      status: '보류',
+      rejectReason: null,
+      holdReason: '법무팀 경품 제세공과금 고지 가이드라인 최종 회신을 기다리는 중입니다.',
+      createdAt: isoAgo(26),
+      updatedAt: isoAgo(6),
+    },
+    {
+      id: 'req_120',
+      teamId: 'team_mkt_1',
+      typeId: 'type_supplies',
+      requesterId: 'user_seoyeon',
+      title: '팀 공용 아이패드 프로 애플펜슬 교체용 팁 및 파우치 신청',
+      content: '미팅 시 시안 피드백 및 현장 체크용으로 쓰는 팀 공용 아이패드의 펜슬 팁 마모로 교체품 신청합니다.',
+      fieldValues: {
+        item_name: '애플펜슬 2세대 정품 팁 4개입, 11인치 보호 파우치',
+        quantity: 2,
+        preferred_date: toLocalISODateOffset(3),
+      },
+      dueDate: toLocalISODateOffset(3),
+      urgency: '낮음',
+      status: '접수',
+      rejectReason: null,
+      createdAt: isoAgo(3.5),
+      updatedAt: isoAgo(3.5),
+    },
+    {
+      id: 'req_121',
+      teamId: 'team_mkt_1',
+      typeId: 'type_suggestion',
+      requesterId: 'user_junho',
+      title: '월간 캠페인 성과 리포트 템플릿 Collabee 양식 연동 제안',
+      content: '매월 반복되는 캠페인 회고 요청을 표준 양식으로 고정해두면 각 담당자별 리포트 누락 없이 취합이 편할 것 같습니다.',
+      fieldValues: {
+        suggestion_body: '캠페인 회고 전용 요청 유형에 목표 CPA, 실집행 예산, 핵심 인사이트 필드를 추가 제안합니다.',
+        anonymous_hope: true,
+      },
+      dueDate: toLocalISODateOffset(8),
+      urgency: '낮음',
+      status: '확인',
+      rejectReason: null,
+      createdAt: isoAgo(18),
+      updatedAt: isoAgo(7),
+    },
   ];
 
   const recipients: Recipient[] = [
@@ -611,6 +704,26 @@ export function createSeedDatabase(): AppDatabase {
     // req_116: 하은 -> 서연(담당), 민수(참조)
     { id: 'rec_27', requestId: 'req_116', userId: 'user_seoyeon', role: 'assignee', seenAt: null },
     { id: 'rec_28', requestId: 'req_116', userId: 'user_minsu', role: 'cc', seenAt: null },
+
+    // req_117: 지민 -> 하은(담당), 서연(참조) [보류]
+    { id: 'rec_29', requestId: 'req_117', userId: 'user_haeun', role: 'assignee', seenAt: isoAgo(5) },
+    { id: 'rec_30', requestId: 'req_117', userId: 'user_seoyeon', role: 'cc', seenAt: isoAgo(5) },
+
+    // req_118: 민수 -> 서연(담당), 준호(참조) [진행 중]
+    { id: 'rec_31', requestId: 'req_118', userId: 'user_seoyeon', role: 'assignee', seenAt: isoAgo(2.5) },
+    { id: 'rec_32', requestId: 'req_118', userId: 'user_junho', role: 'cc', seenAt: isoAgo(2) },
+
+    // req_119: 하은 -> 민수(담당), 서연(담당), 지민(참조) [보류]
+    { id: 'rec_33', requestId: 'req_119', userId: 'user_minsu', role: 'assignee', seenAt: isoAgo(6) },
+    { id: 'rec_34', requestId: 'req_119', userId: 'user_seoyeon', role: 'assignee', seenAt: isoAgo(6) },
+    { id: 'rec_35', requestId: 'req_119', userId: 'user_jimin', role: 'cc', seenAt: isoAgo(5) },
+
+    // req_120: 서연 -> 하은(담당), 지민(참조) [접수]
+    { id: 'rec_36', requestId: 'req_120', userId: 'user_haeun', role: 'assignee', seenAt: null },
+    { id: 'rec_37', requestId: 'req_120', userId: 'user_jimin', role: 'cc', seenAt: null },
+
+    // req_121: 준호 -> 서연(담당) [확인]
+    { id: 'rec_38', requestId: 'req_121', userId: 'user_seoyeon', role: 'assignee', seenAt: isoAgo(7) },
   ];
 
   const comments: Comment[] = [
@@ -656,6 +769,34 @@ export function createSeedDatabase(): AppDatabase {
       body: '인터뷰형 2종과 팁형 2종 컬러 포인트 나눠서 시안 잡고 있습니다!',
       createdAt: isoAgo(9),
     },
+    {
+      id: 'cmt_7',
+      requestId: 'req_117',
+      authorId: 'user_haeun',
+      body: '스튜디오 측에서 12월 둘째 주 완공 일정 확정되면 바로 우선 예약 잡아두기로 했습니다.',
+      createdAt: isoAgo(5),
+    },
+    {
+      id: 'cmt_8',
+      requestId: 'req_118',
+      authorId: 'user_seoyeon',
+      body: '외부 게스트 2개 계정은 즉시 회수 완료했고, 나머지 1개 공유 페이지 링크 만료 처리 중입니다.',
+      createdAt: isoAgo(2.5),
+    },
+    {
+      id: 'cmt_9',
+      requestId: 'req_119',
+      authorId: 'user_minsu',
+      body: '법무팀 회신 도착하면 문구 바로 업데이트해서 다시 진행 재개하겠습니다.',
+      createdAt: isoAgo(6),
+    },
+    {
+      id: 'cmt_10',
+      requestId: 'req_121',
+      authorId: 'user_seoyeon',
+      body: '좋은 아이디어예요! 주간 회의에서 팀원들과 필드 구성 확인 후 관리자 설정에 반영해 둘게요.',
+      createdAt: isoAgo(7),
+    },
   ];
 
   const statusLogs: StatusLog[] = [
@@ -694,6 +835,33 @@ export function createSeedDatabase(): AppDatabase {
     { id: 'log_24', requestId: 'req_115', actorId: 'user_minsu', fromStatus: null, toStatus: '접수', createdAt: isoAgo(22) },
     { id: 'log_25', requestId: 'req_115', actorId: 'user_jimin', fromStatus: '접수', toStatus: '진행 중', createdAt: isoAgo(9) },
     { id: 'log_26', requestId: 'req_116', actorId: 'user_haeun', fromStatus: null, toStatus: '접수', createdAt: isoAgo(1) },
+    { id: 'log_27', requestId: 'req_117', actorId: 'user_jimin', fromStatus: null, toStatus: '접수', createdAt: isoAgo(34) },
+    { id: 'log_28', requestId: 'req_117', actorId: 'user_haeun', fromStatus: '접수', toStatus: '진행 중', createdAt: isoAgo(18) },
+    {
+      id: 'log_29',
+      requestId: 'req_117',
+      actorId: 'user_haeun',
+      fromStatus: '진행 중',
+      toStatus: '보류',
+      note: '외부 스튜디오 리모델링 공사로 인해 12월 둘째 주 일정 확정 후 촬영 재개 예정입니다.',
+      createdAt: isoAgo(5),
+    },
+    { id: 'log_30', requestId: 'req_118', actorId: 'user_minsu', fromStatus: null, toStatus: '접수', createdAt: isoAgo(15) },
+    { id: 'log_31', requestId: 'req_118', actorId: 'user_seoyeon', fromStatus: '접수', toStatus: '진행 중', createdAt: isoAgo(2.5) },
+    { id: 'log_32', requestId: 'req_119', actorId: 'user_haeun', fromStatus: null, toStatus: '접수', createdAt: isoAgo(26) },
+    { id: 'log_33', requestId: 'req_119', actorId: 'user_minsu', fromStatus: '접수', toStatus: '확인', createdAt: isoAgo(16) },
+    {
+      id: 'log_34',
+      requestId: 'req_119',
+      actorId: 'user_minsu',
+      fromStatus: '확인',
+      toStatus: '보류',
+      note: '법무팀 경품 제세공과금 고지 가이드라인 최종 회신을 기다리는 중입니다.',
+      createdAt: isoAgo(6),
+    },
+    { id: 'log_35', requestId: 'req_120', actorId: 'user_seoyeon', fromStatus: null, toStatus: '접수', createdAt: isoAgo(3.5) },
+    { id: 'log_36', requestId: 'req_121', actorId: 'user_junho', fromStatus: null, toStatus: '접수', createdAt: isoAgo(18) },
+    { id: 'log_37', requestId: 'req_121', actorId: 'user_seoyeon', fromStatus: '접수', toStatus: '확인', createdAt: isoAgo(7) },
   ];
 
   const notifications: Notification[] = [
@@ -776,6 +944,56 @@ export function createSeedDatabase(): AppDatabase {
       message: '최민수님이 "유튜브 쇼츠 썸네일 템플릿 4종 제작 요청"의 담당자로 지정했습니다.',
       readAt: null,
       createdAt: isoAgo(9),
+    },
+    {
+      id: 'noti_9',
+      userId: 'user_jimin',
+      requestId: 'req_117',
+      kind: 'status_changed',
+      actorId: 'user_haeun',
+      message: '정하은님이 "겨울 시즌 제품 스튜디오 컷 촬영 소품 및 모델 일정 조율" 상태를 보류(으)로 변경했습니다.',
+      readAt: null,
+      createdAt: isoAgo(5),
+    },
+    {
+      id: 'noti_10',
+      userId: 'user_minsu',
+      requestId: 'req_118',
+      kind: 'status_changed',
+      actorId: 'user_seoyeon',
+      message: '김서연님이 "노션 팀 위키 외부 게스트 권한 일괄 점검 요청" 상태를 진행 중(으)로 변경했습니다.',
+      readAt: null,
+      createdAt: isoAgo(2.5),
+    },
+    {
+      id: 'noti_11',
+      userId: 'user_haeun',
+      requestId: 'req_119',
+      kind: 'status_changed',
+      actorId: 'user_minsu',
+      message: '최민수님이 "연말 고객 감사 뉴스레터 이벤트 약관 및 안내 문구 검토" 상태를 보류(으)로 변경했습니다.',
+      readAt: null,
+      createdAt: isoAgo(6),
+    },
+    {
+      id: 'noti_12',
+      userId: 'user_haeun',
+      requestId: 'req_120',
+      kind: 'assigned',
+      actorId: 'user_seoyeon',
+      message: '김서연님이 "팀 공용 아이패드 프로 애플펜슬 교체용 팁 및 파우치 신청"의 담당자로 지정했습니다.',
+      readAt: null,
+      createdAt: isoAgo(3.5),
+    },
+    {
+      id: 'noti_13',
+      userId: 'user_junho',
+      requestId: 'req_121',
+      kind: 'comment_added',
+      actorId: 'user_seoyeon',
+      message: '김서연님이 "월간 캠페인 성과 리포트 템플릿 Collabee 양식 연동 제안"에 댓글을 남겼습니다.',
+      readAt: null,
+      createdAt: isoAgo(7),
     },
   ];
 
@@ -865,6 +1083,76 @@ export function createSeedDatabase(): AppDatabase {
         user_jimin: isoAgo(3.2),
         user_minsu: isoAgo(5),
         user_haeun: isoAgo(4),
+      },
+    },
+    {
+      id: 'chat_direct_junho_minsu',
+      teamId: 'team_mkt_1',
+      kind: 'direct',
+      memberIds: ['user_junho', 'user_minsu'],
+      createdBy: 'user_junho',
+      createdAt: isoAgo(16),
+      updatedAt: isoAgo(1.4),
+      lastReadAtByUser: {
+        user_junho: isoAgo(2),
+        user_minsu: isoAgo(1.4),
+      },
+    },
+    {
+      id: 'chat_direct_jimin_haeun',
+      teamId: 'team_mkt_1',
+      kind: 'direct',
+      memberIds: ['user_jimin', 'user_haeun'],
+      createdBy: 'user_jimin',
+      createdAt: isoAgo(22),
+      updatedAt: isoAgo(1.8),
+      lastReadAtByUser: {
+        user_jimin: isoAgo(3),
+        user_haeun: isoAgo(1.8),
+      },
+    },
+    {
+      id: 'chat_direct_junho_haeun',
+      teamId: 'team_mkt_1',
+      kind: 'direct',
+      memberIds: ['user_junho', 'user_haeun'],
+      createdBy: 'user_haeun',
+      createdAt: isoAgo(14),
+      updatedAt: isoAgo(2.2),
+      lastReadAtByUser: {
+        user_junho: isoAgo(3),
+        user_haeun: isoAgo(2.2),
+      },
+    },
+    {
+      id: 'chat_group_q1_launch',
+      teamId: 'team_mkt_1',
+      kind: 'group',
+      title: '2027 Q1 신제품 런칭 TF',
+      memberIds: ['user_seoyeon', 'user_junho', 'user_jimin', 'user_haeun'],
+      createdBy: 'user_seoyeon',
+      createdAt: isoAgo(40),
+      updatedAt: isoAgo(0.9),
+      lastReadAtByUser: {
+        user_seoyeon: isoAgo(1.5),
+        user_junho: isoAgo(2),
+        user_jimin: isoAgo(0.9),
+        user_haeun: isoAgo(2),
+      },
+    },
+    {
+      id: 'chat_group_analytics',
+      teamId: 'team_mkt_1',
+      kind: 'group',
+      title: '데이터 & SEO 리포트 채널',
+      memberIds: ['user_seoyeon', 'user_junho', 'user_minsu'],
+      createdBy: 'user_junho',
+      createdAt: isoAgo(27),
+      updatedAt: isoAgo(1.1),
+      lastReadAtByUser: {
+        user_seoyeon: isoAgo(3),
+        user_junho: isoAgo(1.1),
+        user_minsu: isoAgo(2),
       },
     },
   ];
@@ -974,6 +1262,83 @@ export function createSeedDatabase(): AppDatabase {
       senderId: 'user_haeun',
       body: '배터리랑 타블렛 펜촉 발주 요청 올라온 거 오늘 바로 주문 넣어둘게요!',
       createdAt: isoAgo(3.2),
+    },
+    {
+      id: 'cmsg_16',
+      roomId: 'chat_direct_junho_minsu',
+      senderId: 'user_junho',
+      body: '민수님, 랜딩페이지 A/B 테스트용 카피 2안 중 혜택 강조형부터 먼저 걸어보려는데 괜찮을까요?',
+      createdAt: isoAgo(2.2),
+    },
+    {
+      id: 'cmsg_17',
+      roomId: 'chat_direct_junho_minsu',
+      senderId: 'user_minsu',
+      body: '네 좋아요! 모바일 첫 화면에서 줄바꿈 안 깨지게 18자 내외로 다듬어 보낼게요.',
+      createdAt: isoAgo(1.4),
+    },
+    {
+      id: 'cmsg_18',
+      roomId: 'chat_direct_jimin_haeun',
+      senderId: 'user_haeun',
+      body: '지민님, 겨울 스튜디오 촬영건 공사 때문에 일시 보류 처리해 두었어요. 일정 확정되면 바로 알림 드릴게요!',
+      createdAt: isoAgo(2.6),
+    },
+    {
+      id: 'cmsg_19',
+      roomId: 'chat_direct_jimin_haeun',
+      senderId: 'user_jimin',
+      body: '확인했어요! 그동안 상세페이지 와이어프레임이랑 제품 컷 보정 가이드 먼저 맞춰두겠습니다.',
+      createdAt: isoAgo(1.8),
+    },
+    {
+      id: 'cmsg_20',
+      roomId: 'chat_direct_junho_haeun',
+      senderId: 'user_junho',
+      body: '하은님, 온보딩 웰컴키트 QR 단축 링크 UTM 파라미터 구조 시트 공유드렸습니다!',
+      createdAt: isoAgo(3.1),
+    },
+    {
+      id: 'cmsg_21',
+      roomId: 'chat_direct_junho_haeun',
+      senderId: 'user_haeun',
+      body: '바로 확인했어요! 인쇄소 넘기기 전에 스캔 테스트 한 번 같이 해봐요.',
+      createdAt: isoAgo(2.2),
+    },
+    {
+      id: 'cmsg_22',
+      roomId: 'chat_group_q1_launch',
+      senderId: 'user_seoyeon',
+      body: 'Q1 신제품 런칭 티저 오픈까지 3주 남았습니다. 각 파트별 선행 체크리스트 한 번씩 업데이트 부탁드려요.',
+      createdAt: isoAgo(6),
+    },
+    {
+      id: 'cmsg_23',
+      roomId: 'chat_group_q1_launch',
+      senderId: 'user_junho',
+      body: '검색광고 키워드 그룹이랑 리타겟팅 모수 세팅 초안 완료했습니다.',
+      createdAt: isoAgo(2.1),
+    },
+    {
+      id: 'cmsg_24',
+      roomId: 'chat_group_q1_launch',
+      senderId: 'user_jimin',
+      body: '키비주얼 톤앤매너 확정본 피그마에 올려두었으니 확인 후 코멘트 주세요!',
+      createdAt: isoAgo(0.9),
+    },
+    {
+      id: 'cmsg_25',
+      roomId: 'chat_group_analytics',
+      senderId: 'user_minsu',
+      body: '11월 블로그 오가닉 유입이 전월 대비 24% 늘었는데, 주요 전환 키워드 정리해 볼까요?',
+      createdAt: isoAgo(3.5),
+    },
+    {
+      id: 'cmsg_26',
+      roomId: 'chat_group_analytics',
+      senderId: 'user_junho',
+      body: '네! 소재별 전환율 데이터 추출 요청건이랑 합쳐서 대시보드에 같이 반영해 둘게요.',
+      createdAt: isoAgo(1.1),
     },
   ];
 
